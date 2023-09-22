@@ -10,12 +10,10 @@ import jakarta.persistence.ManyToOne;
 
 public class Employee {
 
-	
-    @Id
-    
+	@Id
     private Long id;
     private String name;
-    
+
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
@@ -55,9 +53,5 @@ public class Employee {
 	public void setDepartment(Department department) {
 		this.department = department;
 	}
-
-	
     
-    
-    
-}
+	}

@@ -1,19 +1,17 @@
 package com.mycompany.mycompany.entites;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 
 public class Office {
 
-	
-	
-    @Id
+	@Id
     
     private Long id;
     private String address;
@@ -45,7 +43,7 @@ public class Office {
 	}
 	public void setCountry(String country) {
 		this.country = country;
-	} 
-	
+	}
     
+   
 }

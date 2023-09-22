@@ -1,5 +1,6 @@
 package com.mycompany.mycompany.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.mycompany.Dto.SearchRequestDto;
 
-import com.mycompany.mycompany.entites.Department;
+
 import com.mycompany.mycompany.entites.Employee;
-import com.mycompany.mycompany.entites.Office;
-import com.mycompany.mycompany.repository.DepartmentRepository;
+
+
 import com.mycompany.mycompany.repository.EmployeeRepository;
-import com.mycompany.mycompany.repository.OfficeRepository;
+
 
 import jakarta.persistence.criteria.Predicate;
 
@@ -29,51 +30,135 @@ public class SearchController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @Autowired
-    private DepartmentRepository departmentRepository;
-
-    @Autowired
-    private OfficeRepository officeRepository;
-
+    
+    
+    
+    
+    
+    
+    
     @GetMapping("/all")
     public ResponseEntity<SearchRequestDto> searchAll(
-            @RequestParam(name = "searchterm",required = false) String keyword) {
-        List<Employee> employees = employeeRepository.findAll(getEmployeeSpecification(keyword));
-        List<Department> departments = departmentRepository.findAll(getDepartmentSpecification(keyword));
-        List<Office> offices = officeRepository.findAll(getOfficeSpecification(keyword));
+            @RequestParam(name = "employeename", required = false) String employeeName,
+            @RequestParam(name = "departmentname", required = false) String departmentName,
+            @RequestParam(name = "officecountry", required = false) String officeCountry) {
+        List<Employee> employees = employeeRepository.findAll(getEmployeeSpecification(employeeName, departmentName, officeCountry));
 
-      SearchRequestDto resultDTO = new SearchRequestDto(employees, departments, offices);
-      System.out.println(resultDTO);
-      return ResponseEntity.ok(resultDTO);
+        SearchRequestDto resultDTO = new SearchRequestDto(employees);
+        return ResponseEntity.ok(resultDTO);
     }
 
-    private Specification<Employee> getEmployeeSpecification(String keyword) {
-    	System.out.println(keyword);
-    	return (root, query, criteriaBuilder) -> {
-            Predicate namePredicate = criteriaBuilder.like(root.get("name"), "%" + keyword + "%");
-            Predicate departmentPredicate = criteriaBuilder.like(root.get("department").get("name"), "%" + keyword + "%");
-            Predicate officePredicate = criteriaBuilder.like(root.get("department").get("office").get("country"), "%" + keyword + "%");
-            
-            return criteriaBuilder.or(namePredicate, departmentPredicate, officePredicate);
-        };
-    }
-
-    private Specification<Department> getDepartmentSpecification(String keyword) {
+    private Specification<Employee> getEmployeeSpecification(String employeeName, String departmentName, String officeCountry) {
         return (root, query, criteriaBuilder) -> {
-            Predicate namePredicate = criteriaBuilder.like(root.get("name"), "%" + keyword + "%");
-            Predicate officePredicate = criteriaBuilder.like(root.get("office").get("country"), "%" + keyword + "%");
+            List<Predicate> predicates = new ArrayList<>();
             
-            return criteriaBuilder.or(namePredicate, officePredicate);
+            if (employeeName != null && !employeeName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + employeeName + "%"));
+            }
+            
+            if (departmentName != null && !departmentName.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("department").get("name"), "%" + departmentName + "%"));
+            }
+            
+            if (officeCountry != null && !officeCountry.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("department").get("office").get("country"), "%" + officeCountry + "%"));
+            }
+
+            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
         };
     }
 
-    private Specification<Office> getOfficeSpecification(String keyword) {
-        return (root, query, criteriaBuilder) -> {
-            Predicate addressPredicate = criteriaBuilder.like(root.get("address"), "%" + keyword + "%");
-            Predicate countryPredicate = criteriaBuilder.like(root.get("country"), "%" + keyword + "%");
-            
-            return criteriaBuilder.or(addressPredicate, countryPredicate);
-        };
-    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+//    @GetMapping("/all")
+//    public ResponseEntity<SearchRequestDto> searchAll(
+//            @RequestParam(name = "searchterm",required = false) List<String> keyword) {
+//        List<Employee> employees = employeeRepository.findAll(getEmployeeSpecification(keyword));
+//    //    List<Department> departments = departmentRepository.findAll(getDepartmentSpecification(keyword));
+//      //  List<Office> offices = officeRepository.findAll(getOfficeSpecification(keyword));
+//
+//      SearchRequestDto resultDTO = new SearchRequestDto(employees);
+//      System.out.println(resultDTO);
+//      return ResponseEntity.ok(resultDTO);
+//    }
+//
+//    private Specification<Employee> getEmployeeSpecification(List<String> keywords) {
+//    	System.out.println(keywords);
+//    	return (root, query, criteriaBuilder) -> {
+//            List<Predicate> predicates = new ArrayList<>();
+//            
+//            if (keywords != null && !keywords.isEmpty()) {
+//                for (String keyword : keywords) {
+//                    Predicate namePredicate = criteriaBuilder.like(root.get("name"), "%" + keyword + "%");
+//                    Predicate departmentPredicate = criteriaBuilder.like(root.get("department").get("name"), "%" + keyword + "%");
+//                    Predicate officePredicate = criteriaBuilder.like(root.get("department").get("office").get("country"), "%" + keyword + "%");
+//                    predicates.add(criteriaBuilder.or(namePredicate, departmentPredicate, officePredicate));
+//                }
+//            }
+//
+//            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+//        };
+//    }
+//
+//    private Specification<Department> getDepartmentSpecification(List<String> keywords) {
+//        return (root, query, criteriaBuilder) -> {
+//            List<Predicate> predicates = new ArrayList<>();
+//            
+//            if (keywords != null && !keywords.isEmpty()) {
+//                for (String keyword : keywords) {
+//                    Predicate namePredicate = criteriaBuilder.like(root.get("name"), "%" + keyword + "%");
+//                    Predicate officePredicate = criteriaBuilder.like(root.get("office").get("country"), "%" + keyword + "%");
+//                    predicates.add(criteriaBuilder.or(namePredicate, officePredicate));
+//                }
+//            }
+//
+//            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+//        };
+//    }
+//
+//    private Specification<Office> getOfficeSpecification(List<String> keywords) {
+//        return (root, query, criteriaBuilder) -> {
+//        	List<Predicate> predicates = new ArrayList<>();
+//            
+//            if (keywords != null && !keywords.isEmpty()) {
+//                for (String keyword : keywords) {
+//                    Predicate addressPredicate = criteriaBuilder.like(root.get("address"), "%" + keyword + "%");
+//                    Predicate countryPredicate = criteriaBuilder.like(root.get("country"), "%" + keyword + "%");
+//                    predicates.add(criteriaBuilder.or(addressPredicate, countryPredicate));
+//                }
+//            }
+//
+//            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+//        };
+//    }
 }
 
