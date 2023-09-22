@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.mycompany.mycompany.Dto.SearchRequestDto;
-
-
+import com.mycompany.mycompany.entites.Department;
 import com.mycompany.mycompany.entites.Employee;
-
-
+import com.mycompany.mycompany.entites.Office;
 import com.mycompany.mycompany.repository.EmployeeRepository;
 
-
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 
 @RestController
@@ -30,7 +29,6 @@ public class SearchController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    
     
     
     
@@ -57,15 +55,22 @@ public class SearchController {
             }
             
             if (departmentName != null && !departmentName.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("department").get("name"), "%" + departmentName + "%"));
+                // Join Employee to Department
+                Join<Employee, Department> departmentJoin = root.join("department", JoinType.INNER);
+                predicates.add(criteriaBuilder.like(departmentJoin.get("name"), "%" + departmentName + "%"));
             }
             
             if (officeCountry != null && !officeCountry.isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("department").get("office").get("country"), "%" + officeCountry + "%"));
+                // Join Employee to Department and Department to Office
+                Join<Employee, Department> departmentJoin = root.join("department", JoinType.INNER); 
+                Join<Department, Office> officeJoin = departmentJoin.join("office", JoinType.INNER); 
+                predicates.add(criteriaBuilder.like(officeJoin.get("country"), "%" + officeCountry + "%"));
             }
 
-            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
     }
 
     
@@ -160,5 +165,4 @@ public class SearchController {
 //            return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
 //        };
 //    }
-}
 
